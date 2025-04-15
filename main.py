@@ -16,7 +16,7 @@ st.title("🧠 Abbreviation & Long-Form Detector")
 st.markdown("Detect abbreviations (AC) and their long forms (LF) in biomedical or technical sentences using a fine-tuned BERT model.")
 
 # Text input
-text_input = st.text_area("Enter a sentence:", "The patient was diagnosed with COPD, which stands for chronic obstructive pulmonary disease.")
+text_input = st.text_area("Enter a sentence:")
 
 # Color map
 label_colors = {
@@ -68,18 +68,16 @@ if st.button("🔍 Detect Entities"):
             if label == "O":
                 styled_sentence += f"<span style='margin-right: 6px;'>{word}</span> "
             else:
-                color = label_colors[label]
-                styled_sentence += f"""
-                <span style='margin: 4px; display: inline-block; vertical-align: middle;'>
-                    <span style='background-color: {color}; border-radius: 8px; padding: 6px 10px;
-                                display: inline-flex; align-items: center; gap: 6px;'>
-                        <span style='font-weight: 500;'>{word}</span>
-                        <span style='background-color: rgba(0,0,0,0.1); border-radius: 4px; padding: 2px 6px;
-                                     font-size: 11px; font-weight: bold;'>{label}</span>
-                    </span>
-                </span>
-                """
-
+                color = label_colors.get(label, "#eeeeee")
+                styled_sentence += (
+                    f"<span style='margin: 4px; display: inline-block; vertical-align: middle;'>"
+                    f"<span style='background-color: {color}; border-radius: 8px; padding: 6px 10px;"
+                    f"display: inline-flex; align-items: center; gap: 6px;'>"
+                    f"<span style='font-weight: 500;'>{word}</span>"
+                    f"<span style='background-color: rgba(0,0,0,0.1); border-radius: 4px; padding: 2px 6px;"
+                    f"font-size: 11px; font-weight: bold;'>{label}</span>"
+                    f"</span></span>"
+                )
         # ✅ RENDER using markdown (not code!)
         st.markdown("### 🧾 Tagged Sentence")
         st.markdown(styled_sentence, unsafe_allow_html=True)
