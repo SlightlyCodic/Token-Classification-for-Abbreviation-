@@ -47,19 +47,30 @@ if st.button("Detect Entities"):
             word = words[word_id]
             results.append((word, label))
             seen.add(word_id)
-        # Color map for labels
-        label_colors = {
-            "B-AC": "#f39c12",   # orange
-            "B-LF": "#27ae60",   # green
-            "I-LF": "#2ecc71",   # light green
-            "O": "#bdc3c7"       # gray
-        }
+            # Color map for labels
+            label_colors = {
+                "B-AC": "#f39c12",   # orange
+                "B-LF": "#27ae60",   # green
+                "I-LF": "#2ecc71",   # light green
+                "O": None            # no background for 'O'
+            }
+            
+            # Styled sentence builder (Hugging Face demo style)
+            styled_sentence = ""
+            for word, label in results:
+                if label == "O":
+                    styled_sentence += f"<span style='margin-right: 4px'>{word}</span> "
+                else:
+                    bg_color = label_colors.get(label, "#eeeeee")
+                    styled_sentence += f"""
+                    <span style='margin: 4px; display: inline-block; vertical-align: middle;'>
+                        <span style='background-color: {bg_color}; border-radius: 8px; padding: 6px 10px; display: inline-flex; align-items: center; gap: 6px;'>
+                            <span style='font-weight: 500;'>{word}</span>
+                            <span style='background-color: rgba(0,0,0,0.1); border-radius: 4px; padding: 2px 6px; font-size: 11px; font-weight: bold;'>{label}</span>
+                        </span>
+                    </span>
+                    """
+            
+            st.markdown("### 🧾 Tagged Sentence")
+            st.markdown(styled_sentence, unsafe_allow_html=True)
 
-        # Build styled sentence
-        styled_sentence = ""
-        for word, label in results:
-            bg_color = label_colors.get(label, "#ffffff")
-            styled_sentence += f"<span style='background-color: {bg_color}; padding: 4px 8px; border-radius: 6px; margin-right: 4px; color: black; font-weight: 500;'>{word}</span>"
-
-        # Display the full sentence
-        st.markdown(styled_sentence, unsafe_allow_html=True)
