@@ -6,18 +6,18 @@ from transformers import AutoTokenizer, AutoModelForTokenClassification
 model_name = "slightlycodic/TC-ABB-BERT"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForTokenClassification.from_pretrained(model_name)
-label_list = ['O', 'B-AC', 'B-LF', 'I-LF']  # update if different
+label_list = ['O', 'B-AC', 'B-LF', 'I-LF']  # Match this to your model's labels
 
-# Title and UI
+# Set page config
 st.set_page_config(page_title="Abbreviation & Long-Form Detection", layout="wide")
-st.title("🧠 Abbreviation & Long-Form Detector (NER)")
-st.markdown("Detects abbreviations (AC) and their long forms (LF)")
+st.title("🧠 Abbreviation & Long-Form Detector")
+st.markdown("Detects abbreviations (AC) and their long forms (LF) in text using a fine-tuned BERT model.")
 
-# User input
-text_input = st.text_area("Enter a sentence:")
+# Text input
+text_input = st.text_area("✍️ Enter your sentence:", "The patient was diagnosed with COPD, which stands for chronic obstructive pulmonary disease.")
 
-# Predict button
-if st.button("Detect Entities"):
+# Button
+if st.button("🔍 Detect Entities"):
     if text_input.strip():
         words = text_input.strip().split()
 
@@ -47,15 +47,16 @@ if st.button("Detect Entities"):
             word = words[word_id]
             results.append((word, label))
             seen.add(word_id)
-        # Color map for labels
+
+        # Color map
         label_colors = {
             "B-AC": "#f39c12",   # orange
             "B-LF": "#27ae60",   # green
             "I-LF": "#2ecc71",   # light green
-            "O": None            # no background for 'O'
+            "O": None            # no background
         }
-        
-        # Styled sentence builder (Hugging Face demo style)
+
+        # Render sentence Hugging Face style
         styled_sentence = ""
         for word, label in results:
             if label == "O":
@@ -70,7 +71,8 @@ if st.button("Detect Entities"):
                     </span>
                 </span>
                 """
-        
+
         st.markdown("### 🧾 Tagged Sentence")
         st.markdown(styled_sentence, unsafe_allow_html=True)
-
+    else:
+        st.warning("Please enter a sentence.")
