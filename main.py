@@ -47,9 +47,19 @@ if st.button("Detect Entities"):
             word = words[word_id]
             results.append((word, label))
             seen.add(word_id)
+        # Color map for labels
+        label_colors = {
+            "B-AC": "#f39c12",   # orange
+            "B-LF": "#27ae60",   # green
+            "I-LF": "#2ecc71",   # light green
+            "O": "#bdc3c7"       # gray
+        }
 
-        # Display results
+        # Build styled sentence
+        styled_sentence = ""
         for word, label in results:
-            st.markdown(f"<span style='background-color: #f0f0f0; padding: 5px; border-radius: 5px;'>{word}</span> → <span style='color: #007acc; font-weight: bold'>{label}</span>", unsafe_allow_html=True)
-    else:
-        st.warning("Please enter a sentence.")
+            bg_color = label_colors.get(label, "#ffffff")
+            styled_sentence += f"<span style='background-color: {bg_color}; padding: 4px 8px; border-radius: 6px; margin-right: 4px; color: black; font-weight: 500;'>{word}</span>"
+
+        # Display the full sentence
+        st.markdown(styled_sentence, unsafe_allow_html=True)
