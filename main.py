@@ -73,6 +73,6 @@ if st.button("🔍 Detect Entities"):
                 """
 
         st.markdown("### 🧾 Tagged Sentence")
-        st.markdown(styled_sentence, unsafe_allow_html=True)
+        st.markdown(styled_sentence, unsafe_allow_html=False)
     else:
         st.warning("Please enter a sentence.")
