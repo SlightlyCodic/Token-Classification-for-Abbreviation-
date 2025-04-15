@@ -11,10 +11,10 @@ label_list = ['O', 'B-AC', 'B-LF', 'I-LF']  # update if different
 # Title and UI
 st.set_page_config(page_title="Abbreviation & Long-Form Detection", layout="wide")
 st.title("🧠 Abbreviation & Long-Form Detector (NER)")
-st.markdown("Detects abbreviations (AC) and their long forms (LF) in medical or technical text using a BERT model.")
+st.markdown("Detects abbreviations (AC) and their long forms (LF)")
 
 # User input
-text_input = st.text_area("Enter a sentence:", "MRR, mortality rate ratio; TBI, traumatic brain injury.")
+text_input = st.text_area("Enter a sentence:")
 
 # Predict button
 if st.button("Detect Entities"):
