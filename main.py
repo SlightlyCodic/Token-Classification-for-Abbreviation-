@@ -11,8 +11,8 @@ model = AutoModelForTokenClassification.from_pretrained(model_name)
 label_list = ['O', 'B-AC', 'B-LF', 'I-LF']
 
 # Set up the Streamlit app
-st.set_page_config(page_title="Abbreviation Detector", layout="wide")
-st.title("🧠 Abbreviation & Long-Form Detector")
+st.set_page_config(page_title="Token Classification", layout="wide")
+st.title("🧠 Token Classification for Abbreviation Detection")
 st.markdown("Detect abbreviations (AC) and their long forms (LF)")
 
 # Text input
