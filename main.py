@@ -61,12 +61,12 @@ if st.button("🔍 Detect Entities"):
             word = words[word_id]
             results.append((word, label))
             seen.add(word_id)
-
-        # Build HTML output
+            
+        # Build HTML sentence
         styled_sentence = ""
         for word, label in results:
             if label == "O":
-                styled_sentence += f"<span style='margin-right: 6px;'>{word}</span>"
+                styled_sentence += f"<span style='margin-right: 6px;'>{word}</span> "
             else:
                 color = label_colors[label]
                 styled_sentence += f"""
@@ -80,6 +80,8 @@ if st.button("🔍 Detect Entities"):
                 </span>
                 """
 
-        # Show output
+        # ✅ RENDER using markdown (not code!)
         st.markdown("### 🧾 Tagged Sentence")
         st.markdown(styled_sentence, unsafe_allow_html=True)
+
+
