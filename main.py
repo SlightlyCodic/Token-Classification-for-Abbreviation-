@@ -13,7 +13,7 @@ label_list = ['O', 'B-AC', 'B-LF', 'I-LF']
 # Set up the Streamlit app
 st.set_page_config(page_title="Abbreviation Detector", layout="wide")
 st.title("🧠 Abbreviation & Long-Form Detector")
-st.markdown("Detect abbreviations (AC) and their long forms (LF) in biomedical or technical sentences using a fine-tuned BERT model.")
+st.markdown("Detect abbreviations (AC) and their long forms (LF)")
 
 # Text input
 text_input = st.text_area("Enter a sentence:")
