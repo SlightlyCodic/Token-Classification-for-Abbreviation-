@@ -1,22 +1,30 @@
 import streamlit as st
 import torch
-from transformers import AutoTokenizer, AutoModelForTokenClassification
-
-# Load model and tokenizer
-model_name = "slightlycodic/TC-ABB-BERT"
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForTokenClassification.from_pretrained(model_name)
-
-# Label list used by the model
-label_list = ['O', 'B-AC', 'B-LF', 'I-LF']
+from transformers import (
+    AutoTokenizer, AutoModelForTokenClassification,
+    RobertaTokenizerFast, RobertaForTokenClassification
+)
 
 # Set up the Streamlit app
 st.set_page_config(page_title="Token Classification", layout="wide")
 st.title("🧠 Token Classification for Abbreviation Detection")
 st.markdown("Detect abbreviations (AC) and their long forms (LF)")
 
-# Text input
-text_input = st.text_area("Enter a sentence:")
+# 🔽 Add model selection dropdown
+model_choice = st.selectbox("Choose a model:", ["BERT", "RoBERTa"])
+
+# Load the selected model and tokenizer
+if model_choice == "BERT":
+    model_name = "slightlycodic/TC-ABB-BERT"
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModelForTokenClassification.from_pretrained(model_name)
+else:
+    model_name = "slightlycodic/TC-ABB-ROBERTA"
+    tokenizer = RobertaTokenizerFast.from_pretrained(model_name)
+    model = RobertaForTokenClassification.from_pretrained(model_name)
+
+# Label list used by the model
+label_list = ['O', 'B-AC', 'B-LF', 'I-LF']
 
 # Color map
 label_colors = {
@@ -25,6 +33,9 @@ label_colors = {
     "I-LF": "#2ecc71",   # light green
     "O": None            # plain
 }
+
+# Text input
+text_input = st.text_area("Enter a sentence:")
 
 # On button click
 if st.button("🔍 Detect Entities"):
@@ -61,7 +72,7 @@ if st.button("🔍 Detect Entities"):
             word = words[word_id]
             results.append((word, label))
             seen.add(word_id)
-            
+
         # Build HTML sentence
         styled_sentence = ""
         for word, label in results:
@@ -78,8 +89,7 @@ if st.button("🔍 Detect Entities"):
                     f"font-size: 11px; font-weight: bold;'>{label}</span>"
                     f"</span></span>"
                 )
+
         # ✅ RENDER using markdown (not code!)
         st.markdown("### 🧾 Tagged Sentence")
         st.markdown(styled_sentence, unsafe_allow_html=True)
-
-
