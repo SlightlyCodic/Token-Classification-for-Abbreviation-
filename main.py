@@ -4,6 +4,7 @@ from transformers import (
     AutoTokenizer, AutoModelForTokenClassification,
     RobertaTokenizerFast, RobertaForTokenClassification
 )
+torch.classes = None  # Prevents Streamlit from trying to explore `torch.classes`
 
 # Set up the Streamlit app
 st.set_page_config(page_title="Token Classification", layout="wide")
