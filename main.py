@@ -21,8 +21,8 @@ if model_choice == "BERT":
     model = AutoModelForTokenClassification.from_pretrained(model_name)
 else:
     model_name = "slightlycodic/TC-ABB-ROBERTA"
-    tokenizer = RobertaTokenizerFast.from_pretrained(model_name)
-    model = RobertaForTokenClassification.from_pretrained(model_name)
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModelForTokenClassification.from_pretrained(model_name)
 
 # Label list used by the model
 label_list = ['O', 'B-AC', 'B-LF', 'I-LF']
