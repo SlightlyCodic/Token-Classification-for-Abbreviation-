@@ -1,52 +1,51 @@
 import streamlit as st
 import torch
-from transformers import (
-    AutoTokenizer, AutoModelForTokenClassification,
-    RobertaTokenizerFast, RobertaForTokenClassification
-)
-torch.classes = None  # Prevents Streamlit from trying to explore `torch.classes`
+from transformers import AutoTokenizer, AutoModelForTokenClassification
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+from datetime import datetime
+import json
+from io import StringIO
+
+#torch.classes = None  
+
+def save_into_sheets(user_input, predictions):
+    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+    creds_dict = json.loads(st.secrets["GCP_SERVICE_ACCOUNT"])
+    creds_file = StringIO(json.dumps(creds_dict))
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+    client = gspread.authorize(creds)
+    sheet = client.open("Token Classification Logs").sheet1
+    timestamp = datetime.now().isoformat()
+    predictions_list = ", ".join([f"{w}:{l}" for w, l in predictions])
+    sheet.append_row([timestamp, user_input, predictions_list])
 
 # Set up the Streamlit app
 st.set_page_config(page_title="Token Classification", layout="wide")
 st.title("🧠 Token Classification for Abbreviation Detection")
 st.markdown("Detect abbreviations (AC) and their long forms (LF)")
 
-# 🔽 Add model selection dropdown
-model_choice = st.selectbox("Choose a model:", ["BERT", "RoBERTa"])
 
-# Load the selected model and tokenizer
-if model_choice == "BERT":
-    model_name = "slightlycodic/TC-ABB-BERT"
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForTokenClassification.from_pretrained(model_name)
-else:
-    model_name = "slightlycodic/TC-ABB-ROBERTA"
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForTokenClassification.from_pretrained(model_name)
+# Load the best model
+model_name = "slightlycodic/TC-ABB-BERT"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForTokenClassification.from_pretrained(model_name)
 
-# Label list used by the model
 label_list = ['O', 'B-AC', 'B-LF', 'I-LF']
 
-# Color map
 label_colors = {
-    "B-AC": "#f39c12",   # orange
-    "B-LF": "#27ae60",   # green
-    "I-LF": "#2ecc71",   # light green
-    "O": None            # plain
+    "B-AC": "#f39c12",   
+    "B-LF": "#27ae60",   
+    "I-LF": "#2ecc71",   
+    "O": None            
 }
-
-# Text input
 text_input = st.text_area("Enter a sentence:")
 
-# On button click
-if st.button("🔍 Detect Entities"):
+if st.button("🔍 Detect Abbreviations"):
     if not text_input.strip():
         st.warning("Please enter a sentence.")
     else:
-        # Preprocess
         words = text_input.strip().split()
-
-        # Tokenize with alignment
         encoding = tokenizer(
             words,
             is_split_into_words=True,
@@ -55,8 +54,6 @@ if st.button("🔍 Detect Entities"):
             return_offsets_mapping=True
         )
         inputs = {k: v for k, v in encoding.items() if k != "offset_mapping"}
-
-        # Inference
         with torch.no_grad():
             outputs = model(**inputs)
             predictions = torch.argmax(outputs.logits, dim=2)
@@ -73,8 +70,14 @@ if st.button("🔍 Detect Entities"):
             word = words[word_id]
             results.append((word, label))
             seen.add(word_id)
+                
+        try:
+            save_into_sheets(text_input.strip(), results)
+        except Exception as e:
+            st.error("Failed to save log to Google Sheets.")
+            st.exception(e)    
+        
 
-        # Build HTML sentence
         styled_sentence = ""
         for word, label in results:
             if label == "O":
@@ -90,7 +93,9 @@ if st.button("🔍 Detect Entities"):
                     f"font-size: 11px; font-weight: bold;'>{label}</span>"
                     f"</span></span>"
                 )
-
-        # ✅ RENDER using markdown (not code!)
         st.markdown("### 🧾 Tagged Sentence")
         st.markdown(styled_sentence, unsafe_allow_html=True)
+st.markdown(
+    '<a href="https://docs.google.com/spreadsheets/d/1RKW3WQ9v8KthoPPuHaUTWT32M36u88g6h8_3jOLjPwo/edit?usp=sharing" target="_blank">📊 View Logs in Google Sheets</a>',
+    unsafe_allow_html=True
+)
